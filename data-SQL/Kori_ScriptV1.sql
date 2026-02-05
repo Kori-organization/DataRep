@@ -32,7 +32,7 @@ CREATE TABLE grades (
     id SERIAL PRIMARY KEY,
     grade1 DECIMAL(10,2) NOT NULL CHECK (grade1 BETWEEN 0 AND 10),
     grade2 DECIMAL(10,2) NOT NULL CHECK (grade2 BETWEEN 0 AND 10),
-    rec DECIMAL(10,2) NOT NULL CHECK (rec BETWEEN 0 AND 10),
+    rec DECIMAL(10,2) CHECK (rec BETWEEN 0 AND 10),
     subject_id INTEGER NOT NULL,
     CONSTRAINT fk_grades_subject
         FOREIGN KEY (subject_id)

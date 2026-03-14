@@ -1,5 +1,8 @@
 from fastapi import FastAPI
-from app.database import get_connection
+
+from app.routes.student import router as student_router
+from app.routes.professor import router as professor_router
+from app.routes.chat import router as chat_router
 
 app = FastAPI()
 
@@ -9,14 +12,6 @@ def root():
     return {"message": "API funcionando 🚀"}
 
 
-@app.get("/test-db")
-def test_db():
-    conn = get_connection()
-    cur = conn.cursor()
-
-    cur.execute("SELECT 1;")
-    result = cur.fetchone()
-
-    conn.close()
-
-    return {"database": result}
+app.include_router(student_router)
+app.include_router(professor_router)
+app.include_router(chat_router)

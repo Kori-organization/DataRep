@@ -1,15 +1,12 @@
-import psycopg
-from app.config import settings
+# database.py
+import asyncpg
+from app.core.config import settings
 
-
-def get_connection():
-    conn = psycopg.connect(
-        host=settings.DB_HOST,
-        port=settings.DB_PORT,
-        dbname=settings.DB_NAME,
+async def get_connection():
+    return await asyncpg.connect(
         user=settings.DB_USER,
         password=settings.DB_PASSWORD,
-        sslmode="require"
+        database=settings.DB_NAME,
+        host=settings.DB_HOST,
+        port=settings.DB_PORT
     )
-
-    return conn

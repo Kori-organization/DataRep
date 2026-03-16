@@ -5,7 +5,13 @@ from app.routes.professor import router as professor_router
 from app.routes.chat import router as chat_router
 
 app = FastAPI()
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def root():

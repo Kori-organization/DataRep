@@ -5,3 +5,14 @@ asyncpg
 google-genai
 python-dotenv
 pydantic-settings
+List
+BaseModel
+Optional
+APIRouter
+Json
+dotenv
+langchain_google_genai
+langchain_core.prompts
+langchain_core.output_parsers
+date
+Field

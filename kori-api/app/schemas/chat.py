@@ -1,7 +1,10 @@
-from fastapi import APIRouter
+from pydantic import BaseModel
 
-router = APIRouter()
 
-@router.get("/chat")
-def chat_test():
-    return {"message": "chat funcionando 🚀"}
+class StudentQuestionRequest(BaseModel):
+    enrollment: int
+    question: str
+
+
+class ChatResponseDTO(BaseModel):
+    response: str

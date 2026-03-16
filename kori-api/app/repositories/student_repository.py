@@ -2,7 +2,7 @@ from typing import Optional, List
 import asyncpg
 
 from app.core.database import get_connection
-from app.schemas.studentDTO import StudentReportDTO
+from app.schemas.studentDTO import StudentReportDTO, StudentGradeDTO
 from app.models.reportCard import ReportCardResponse
 from app.models.grades import GradesResponse
 from app.models.observation import Observation
@@ -21,6 +21,7 @@ class StudentRepository:
                 s.issue_date,
                 rc.id AS report_id,
                 rc.final_situation,
+                su.name AS subject_name,
                 g.subject_id,
                 g.grade1,
                 g.grade2,
@@ -29,43 +30,53 @@ class StudentRepository:
             LEFT JOIN report_card rc ON rc.student_id = s.enrollment
             LEFT JOIN grade_rep gr ON gr.rep_id = rc.id
             LEFT JOIN grades g ON g.id = gr.grade_id
+            LEFT JOIN subjects su ON su.id = g.subject_id 
             WHERE s.enrollment = $1
+            ORDER BY g.subject_id
         """
 
         conn: asyncpg.Connection = await get_connection()
         try:
-            row = await conn.fetchrow(sql, enrollment)
-            if not row:
+            rows = await conn.fetch(sql, enrollment)
+
+            if not rows:
                 return None
 
+            first_row = rows[0]
             report_card = None
-            grades = None
+            grades: List[StudentGradeDTO] = []
 
-            if row['report_id'] is not None:
+            # Initialize report card if it exists
+            if first_row["report_id"] is not None:
                 report_card = ReportCardResponse(
-                    id=row['report_id'],
-                    student_id=row['enrollment'],
-                    final_situation=row['final_situation']
+                    id=first_row["report_id"],
+                    student_id=first_row["enrollment"],
+                    final_situation=first_row["final_situation"]
                 )
-                if row['subject_id'] is not None:
-                    grades = GradesResponse(
-                        subject_id=row['subject_id'],
-                        grade1=float(row['grade1']) if row['grade1'] is not None else None,
-                        grade2=float(row['grade2']) if row['grade2'] is not None else None,
-                        rec=float(row['rec']) if row['rec'] is not None else None
+
+            # Map grades from all rows
+            for row in rows:
+                if row["subject_id"] is not None:
+                    grades.append(
+                        StudentGradeDTO(
+                            subject_id=row["subject_id"],
+                            subject_name=row["subject_name"],
+                            grade1=row["grade1"],
+                            grade2=row["grade2"],
+                            rec=row["rec"]
+                        )
                     )
 
             return StudentReportDTO(
-                enrollment=row['enrollment'],
-                name=row['student_name'],
-                serie=row['serie'],
-                issue_date=row['issue_date'],
+                enrollment=first_row["enrollment"],
+                name=first_row["student_name"],
+                serie=first_row["serie"],
+                issue_date=first_row["issue_date"],
                 report_card=report_card,
                 grades=grades
             )
         finally:
             await conn.close()
-
 
     @staticmethod
     async def get_student_observations(enrollment: int) -> List[Observation]:
@@ -87,7 +98,6 @@ class StudentRepository:
             ]
         finally:
             await conn.close()
-
 
     @staticmethod
     async def get_all_events() -> List[CalendarEvent]:

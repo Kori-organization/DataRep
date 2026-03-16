@@ -114,3 +114,4 @@ class ProfessorRepository:
             ]
         finally:
             await conn.close()
+            

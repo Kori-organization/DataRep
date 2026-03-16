@@ -1,8 +1,16 @@
-from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
+from pydantic import BaseModel, Field
 from datetime import date
 from app.models.reportCard import ReportCardResponse
-from app.models.grades import GradesResponse
+
+
+class StudentGradeDTO(BaseModel):
+    subject_id: int
+    subject_name: str
+    grade1: Optional[float] = None
+    grade2: Optional[float] = None
+    rec: Optional[float] = None
+
 
 class StudentReportDTO(BaseModel):
     enrollment: int
@@ -10,4 +18,4 @@ class StudentReportDTO(BaseModel):
     serie: int
     issue_date: date
     report_card: Optional[ReportCardResponse]
-    grades: Optional[GradesResponse]
+    grades: List[StudentGradeDTO] = Field(default_factory=list)

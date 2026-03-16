@@ -6,5 +6,10 @@ class StudentQuestionRequest(BaseModel):
     question: str
 
 
+class ProfessorQuestionRequest(BaseModel):
+    professor_id: int
+    question: str
+
+
 class ChatResponseDTO(BaseModel):
     response: str

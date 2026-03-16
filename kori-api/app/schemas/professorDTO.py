@@ -12,7 +12,5 @@ class ProfessorStudentGradesDTO(BaseModel):
 
 
 class StudentRankingDTO(BaseModel):
-    enrollment: int
-    name: str
     serie: int
     average: Optional[float] = None
